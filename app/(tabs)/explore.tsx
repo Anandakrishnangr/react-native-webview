@@ -1,13 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { BackHandler, StyleSheet } from 'react-native';
-import WebView, { WebViewNavigation } from 'react-native-webview';
+import WebView from 'react-native-webview';
 
 export default function TabTwoScreen() {
   const webViewRef = useRef<WebView>(null);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
     const handleBackPress = () => {
-      if (webViewRef.current && webViewRef.current.canGoBack) {
+      if (canGoBack && webViewRef.current) {
         webViewRef.current.goBack();
         return true; // Prevent the app from closing
       }
@@ -15,24 +16,17 @@ export default function TabTwoScreen() {
     };
 
     BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
     };
-  }, []);
-
-  const handleNavigationStateChange = (navState: WebViewNavigation) => {
-    if (webViewRef.current) {
-      webViewRef.current.canGoBack = navState.canGoBack;
-    }
-  };
+  }, [canGoBack]);
 
   return (
     <WebView
       ref={webViewRef}
-      source={{ uri: 'https://beta.ledgerx365.com' }}
+      source={{ uri: 'https://app.ledgerx.biz/' }}
       style={{ flex: 1 }}
-      onNavigationStateChange={handleNavigationStateChange}
+      onNavigationStateChange={(navState) => setCanGoBack(navState.canGoBack)}
       allowsBackForwardNavigationGestures // For iOS swipe back gesture
     />
   );
